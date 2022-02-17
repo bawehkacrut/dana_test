@@ -1,5 +1,4 @@
-import pandas as pd
-import glob, os, json
+import glob, os
 import logging
 from pathlib import Path
 from helpers.postgres_helper import PostgresHelper
@@ -19,6 +18,10 @@ if __name__ == '__main__':
         'checkin',
         'business',
         'review'
+        'tip',
+        'user',
+        'temperature',
+        'precipitation'
         ]
 
     dataset_path=os.path.join(parent_path, "dana_test/dataset/csv/")
@@ -30,11 +33,10 @@ if __name__ == '__main__':
         file_list = glob.glob(csv_pattern)
 
         for file in file_list:
-            df = pd.read_csv(file, sep='~')
             print(f"[Job Info]: Will write file '{file}' to Postgre")
             table_name = '{}.{}'.format(schema, tbl)
             PostgresHelper.load_to_postgres(
-                df,
+                file,
                 table_name,
                 hostname,
                 port,

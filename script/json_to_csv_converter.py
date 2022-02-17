@@ -1,8 +1,6 @@
-from operator import index
 import pandas as pd
-import json
-import csv
-from pandas import json_normalize
+import os
+from pathlib import Path
 
 
 def convert_json_to_csv(source_path, table_name):
@@ -14,32 +12,44 @@ def convert_json_to_csv(source_path, table_name):
         lines=True
     ) as reader:
         for itterate_no, chunk in enumerate(reader):
-            base_path=f'/Users/admin/my_projects/dana_test/dataset/csv/{table_name}/'
+            base_path=f'{source_path}csv/{table_name}/'
             filename=f"yelp_academic_dataset_{table_name}_{itterate_no}.csv"
             print(chunk.dtypes)
+            print("[Job Info]: Will replace new line char")
+            chunk = chunk.replace('\n',' ', regex=True)
+            chunk = chunk.replace('\r',' ', regex=True)
+            chunk = chunk.replace('~','', regex=True)
+            chunk = chunk.replace(r'\\', '', regex=True)
+            print("[Job Info]: Eeplace new line char success")
             chunk.to_csv(
                 base_path+filename,
                 sep='~',
                 index=False,
                 escapechar="\\",
-                line_terminator='\r\n'
+                header=False
                 )
             print(f"[Job Info]: write csv '{filename}'")
 
-table_list = [
-    'business',
-    'checkin',
-    'review'
-    'tip',
-    'user'
-]
 
+if __name__ == '__main__':
 
-json_path = '/Users/admin/my_projects/dana_test/dataset/yelp_dataset/'
+    hostname='localhost'
+    port=5432
+    database_name='dana'
+    user='dana'
+    password='dana123'
+    parent_path = Path().resolve().parent
+    json_path=os.path.join(parent_path, "dataset/yelp_dataset/")
+    table_list = [
+        'business',
+        'checkin',
+        'review',
+        'tip',
+        'user'
+    ]
 
+    for table_name in table_list:
 
-for table_name in table_list:
-
-    print(f"[Job Info]: Will convert json file '{table_name}' to csv format")
-    convert_json_to_csv(json_path, table_name)
-    print(f"[Job Info]: covert file '{table_name}' to csv sucess!")
+        print(f"[Job Info]: Will convert json file '{table_name}' to csv format")
+        convert_json_to_csv(json_path, table_name)
+        print(f"[Job Info]: covert file '{table_name}' to csv sucess!")
