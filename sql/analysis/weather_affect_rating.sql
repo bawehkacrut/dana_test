@@ -3,7 +3,7 @@ select
 	business_id,
 	date(date) as review_date,
 	stars
-from ods.review r 
+from data_warehouse.fact_review r 
 ), weather as (
 select 
 	date,
